@@ -33,8 +33,16 @@ function fruitCollsion(player, fruit)
     end
 end
 
-function wallCollision(player)
-    -- and wrap!
+function player:wallCollision()
+    if self.x >= MAPSIZE then
+        self.x = 0
+    elseif self.x < 0 then
+        self.x = MAPSIZE - 1
+    elseif self.y >= MAPSIZE then
+        self.y = 0
+    elseif self.y < 0 then
+        self.y = MAPSIZE - 1
+    end
 end
 
 function checkCollisions(player, fruit)

@@ -1,6 +1,9 @@
 TILESIZE = 10
+MAPSIZE = 50
 player = {}
 fruit = {}
+game_lost = false
+
 
 local Direction = {
     UP = 0,
@@ -13,14 +16,14 @@ function love.load()
     player.x = 0
     player.y = 0
     player.bodyParts = {}
-    player.cooldown = 10
+    player.cooldown = 50
     player.direction = Direction.DOWN
     fruit:spawn()
 end
 
 function fruit:spawn()
-    self.x = math.random(0, 50)
-    self.y = math.random(0, 50)
+    self.x = math.random(1, MAPSIZE)
+    self.y = math.random(1, MAPSIZE)
 end
 
 function fruitCollsion(player, fruit)
@@ -48,7 +51,7 @@ end
 function checkCollisions(player, fruit)
     player:bodyCollision()
     fruitCollsion(player, fruit)
-    wallCollision(player)
+    player:wallCollision()
 end
 
 function player:bodyCollision()
@@ -56,6 +59,7 @@ function player:bodyCollision()
     for _,p in pairs(partsButFirst) do
         if p.x == self.x and p.y == self.y then
             print("CRASSSH")
+            game_lost = true
         end
     end
 end
@@ -106,6 +110,11 @@ function love.update(dt)
     player:update()
 end
 
+function drawBorder()
+    love.graphics.setColor(0.4, 0.4, 0.4)
+    love.graphics.rectangle("line", 1, 1, MAPSIZE*TILESIZE, MAPSIZE*TILESIZE)
+end
+
 function player:draw()
     love.graphics.setColor(0, 0.4, 0.4)
     love.graphics.rectangle("fill", self.x*TILESIZE, self.y*TILESIZE, TILESIZE, TILESIZE)
@@ -120,6 +129,12 @@ function fruit:draw()
 end
 
 function love.draw()
-    player:draw()
-    fruit:draw()
+    if game_lost then
+        love.graphics.print("Game Over! :(")
+    else
+        love.graphics.print(table.getn(player.bodyParts))
+        drawBorder() -- TODO: run only once...
+        player:draw()
+        fruit:draw()
+    end
 end
